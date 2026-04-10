@@ -1,1 +1,11 @@
 catboost_info/
+notebooks/catboost_info/
+__pycache__/
+.ipynb_checkpoints/
+.vault/.obsidian/
+.vault/**/.obsidian/
+.vault/**/.DS_Store
+.vault/**/*.swp
+.vault/**/*.tmp
+.vault/private/**
+!.vault/private/.gitkeep
