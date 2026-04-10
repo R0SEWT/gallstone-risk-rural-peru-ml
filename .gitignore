@@ -7,5 +7,4 @@ __pycache__/
 .vault/**/.DS_Store
 .vault/**/*.swp
 .vault/**/*.tmp
-.vault/private/**
-!.vault/private/.gitkeep
+.vault/private/
