@@ -27,6 +27,8 @@ Notas de trazabilidad:
 - El paper fue publicado en `Medicine` en febrero de 2024.
 - La ficha actual de UCI indica que los datos provienen de Ankara, Turquía.
 - El archivo incluido en este repo (`data/dataset-uci.xlsx`) contiene `319` registros y `38` predictores más la variable objetivo.
+- El paper describe datos originalmente disponibles por solicitud; este repo usa la release pública posterior en UCI.
+- La release pública actual no coincide de forma perfecta con la descripción narrativa del paper en conteo y naming de variables; la reconciliación detallada se mantiene en la documentación interna del proyecto.
 
 ## Cómo está organizado el caso de estudio
 ### 1. Réplica del paper
@@ -100,8 +102,13 @@ Lectura técnica rápida:
 - El uso razonable del modelo, con la evidencia actual, es tamizaje/priorización y no diagnóstico.
 
 ## Autoría
-- **Trabajo original**: proyecto grupal de réplica experimental y reformulación del problema.
-- **Curación de este repositorio para portafolio**: limpieza de notebooks, replay determinista de resultados, exportación de figuras, estructura reproducible y narrativa técnica del caso de estudio.
+Proyecto desarrollado por:
+- **Rody Vilchez** — UPC
+- **Alejandro Untiveros** — PUCP
+- **Alejandro Gutierrez** — PUCP
+- **Elizabeth Cruces** — UNMSM
+
+Este repositorio es una extensión del caso de estudio original: el equipo diseñó y ejecutó tanto la réplica experimental como la reformulación rural. La versión pública consolida ese trabajo en una estructura reproducible con narrativa técnica de portafolio.
 
 ## Documentación interna
 El repositorio se mantiene además con una vault interna en Markdown bajo `.vault/`, pensada como docs-as-code para entrevistas, narrativa del proyecto y seguimiento profesional. Esa capa convive con la documentación pública, pero excluye notas privadas o sensibles.
@@ -119,6 +126,12 @@ Regenerar notebooks y figuras:
 python scripts/build_portfolio_assets.py
 ```
 
+Auditoría del paper y validación metodológica adicional:
+
+```bash
+python scripts/build_ml_validation_reports.py
+```
+
 Eso vuelve a crear:
 
 - `notebooks/01_replicacion_paper.ipynb`
@@ -126,6 +139,7 @@ Eso vuelve a crear:
 - `figures/metrics_comparison.png`
 - `figures/rural_confusion_matrix.png`
 - `figures/rural_feature_importance.png`
+- `results/ml/` con reportes de validación repetida, curvas y tablas de thresholds
 
 ## Licencia
 El código y la documentación de este repositorio se publican bajo licencia MIT. El dataset y el paper fuente mantienen sus propios términos de uso y atribución.
@@ -140,6 +154,7 @@ El código y la documentación de este repositorio se publican bajo licencia MIT
 ├── data/
 ├── figures/
 ├── notebooks/
+├── results/
 ├── scripts/
 └── archive/
 ```

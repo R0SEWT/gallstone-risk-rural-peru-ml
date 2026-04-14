@@ -1,6 +1,6 @@
 ---
 purpose: Preparar respuestas breves y extendidas a preguntas difíciles de entrevista.
-last_updated: 2026-04-09
+last_updated: 2026-04-10
 source_of_truth: ./10_project_story.md
 status: ready
 ---
@@ -26,6 +26,11 @@ Respuesta extendida:
 - calibración y análisis de costo por error,
 - definición operativa de umbrales de screening,
 - piloto controlado con flujo clínico claro y supervisión médica.
+
+## ¿La mejora en Brier score realmente importa para este proyecto?
+Respuesta corta: solo de forma secundaria. Sirve como chequeo interno de calibración en esta muestra, pero no lo usaría como evidencia fuerte de utilidad en Perú.  
+
+Respuesta extendida: `Brier score` ayuda a comparar qué tan buenas son las probabilidades dentro del mismo dataset, pero su interpretación práctica depende bastante de la población, la prevalencia y la calidad de medición. Como este proyecto usa datos de otro país y una muestra relativamente balanceada, no considero que una mejora en `Brier` cambie la historia principal. Para este caso pesan más `AUC`, `recall`, `specificity`, análisis de umbrales y falsos negativos, porque conectan mejor con un escenario de screening. Si menciono `Brier`, lo presento solo como evidencia complementaria de calibración interna, no como señal de deploy ni de utilidad operativa en Perú.
 
 ## ¿Qué aportaste tú exactamente?
 Respuesta corta: convertí un trabajo exploratorio en un caso de estudio reproducible y defendible para portafolio.  

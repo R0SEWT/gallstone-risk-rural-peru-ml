@@ -1,0 +1,4 @@
+scenario,model,accuracy_mean,accuracy_std,roc_auc_mean,roc_auc_std,pr_auc_mean,pr_auc_std,precision_mean,precision_std,recall_mean,recall_std,f1_mean,f1_std,balanced_accuracy_mean,balanced_accuracy_std,specificity_mean,specificity_std,brier_score_mean,brier_score_std
+replica_completa,ElasticNet LR (all features),0.7723,0.0504,0.8603,0.0419,0.8642,0.0452,0.8066,0.0525,0.7108,0.077,0.7542,0.0589,0.7716,0.0506,0.8324,0.0491,0.1524,0.0231
+replica_completa,GB (ANOVA32),0.7921,0.0355,0.8678,0.0391,0.8874,0.034,0.7919,0.0508,0.7953,0.0778,0.7901,0.0407,0.7923,0.0355,0.7892,0.0731,0.1904,0.0321
+replica_completa,XGBoost (ANOVA32),0.7796,0.0544,0.8505,0.042,0.8753,0.0348,0.7807,0.0661,0.7806,0.0814,0.7775,0.0569,0.7797,0.054,0.7789,0.0874,0.1677,0.0351

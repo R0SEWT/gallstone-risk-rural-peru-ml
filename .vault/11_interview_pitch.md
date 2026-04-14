@@ -10,6 +10,13 @@ status: ready
 ## Versión de 30 segundos
 Tomé un proyecto grupal donde replicamos un paper sobre predicción de cálculos biliares y lo convertí en una pieza de portafolio reproducible. Primero validamos que podíamos reproducir el enfoque con variables completas; después rediseñamos el problema para un escenario rural en Perú eliminando pruebas de laboratorio y usando solo historial médico, antropometría y bioimpedancia. El resultado quedó planteado como screening de riesgo, no como diagnóstico.
 
+## Versión de 60 segundos
+El proyecto parte de un paper de 2024 y su dataset público en UCI. Primero hice una réplica metodológica para comprobar que el pipeline podía reproducir una aproximación publicada con división estratificada, selección de variables y benchmark de varios modelos.  
+
+Después reformulé el problema para un contexto rural en Perú: retiré pruebas de laboratorio y dejé solo historial clínico, antropometría y bioimpedancia, para medir cuánto rendimiento se podía conservar en un escenario más realista de captura en campo.  
+
+La versión rural rindió menos que el escenario completo, pero mantuvo señal útil para priorización. Mi aporte fuerte fue convertir ese trabajo en una pieza de portafolio reproducible, con resultados estables, figuras claras y framing conservador de screening, no diagnóstico.
+
 ## Versión de 60-90 segundos
 El proyecto parte de un paper de 2024 y su dataset público en UCI. La primera etapa fue una réplica metodológica: separación estratificada, escalado, selección ANOVA y benchmark de varios modelos para entender si podíamos obtener un rendimiento comparable con un pipeline reproducible.  
 

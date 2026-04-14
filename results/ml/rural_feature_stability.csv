@@ -1,0 +1,34 @@
+scheme,feature,selected_folds,selection_rate
+ANOVA top 15,BM,15,1.0
+ANOVA top 15,ECF_TBW,15,1.0
+ANOVA top 15,ECW,15,1.0
+ANOVA top 15,Gender,15,1.0
+ANOVA top 15,Hyperlipidemia,15,1.0
+ANOVA top 15,LM,15,1.0
+ANOVA top 15,TBFR,15,1.0
+ANOVA top 15,TFC,15,1.0
+ANOVA top 15,VFA,14,0.9333
+ANOVA top 15,BMI,13,0.8667
+ANOVA top 15,DM,12,0.8
+ANOVA top 15,Height,12,0.8
+ANOVA top 15,TBW,10,0.6667
+ANOVA top 15,MM,9,0.6
+ANOVA top 15,CAD,8,0.5333
+ANOVA top 15,HFA,8,0.5333
+ANOVA top 15,Protein,7,0.4667
+ANOVA top 15,Comorbidity,3,0.2
+ANOVA top 15,VMA,3,0.2
+ANOVA top 15,Weight,3,0.2
+ANOVA top 15,Hypothyroidism,2,0.1333
+ANOVA top 15,ICW,1,0.0667
+L1 non-zero,BM,15,1.0
+L1 non-zero,ECF_TBW,15,1.0
+L1 non-zero,Hyperlipidemia,15,1.0
+L1 non-zero,DM,14,0.9333
+L1 non-zero,VFA,13,0.8667
+L1 non-zero,TBFR,12,0.8
+L1 non-zero,Hypothyroidism,9,0.6
+L1 non-zero,CAD,7,0.4667
+L1 non-zero,LM,7,0.4667
+L1 non-zero,HFA,4,0.2667
+L1 non-zero,Comorbidity,1,0.0667

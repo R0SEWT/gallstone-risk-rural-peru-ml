@@ -1,6 +1,6 @@
 ---
 purpose: Registrar decisiones técnicas clave y el razonamiento que las sostiene.
-last_updated: 2026-04-09
+last_updated: 2026-04-10
 source_of_truth: ../README.md
 status: ready
 ---
@@ -28,6 +28,16 @@ La evidencia disponible no sostiene un claim clínico fuerte:
 - sin evaluación prospectiva.
 
 El framing correcto es soporte para tamizaje/priorización de riesgo.
+
+## Por qué Brier score no es central en el argumento
+La calibración importa, pero en este proyecto no la trataría como argumento principal:
+
+- el dataset no es peruano,
+- la prevalencia operativa local no está validada,
+- la muestra usada para evaluar está relativamente balanceada,
+- no hay recalibración ni validación externa local.
+
+Por eso `Brier score` queda como señal metodológica secundaria de calibración interna. Para defender el caso rural pesan más las métricas y análisis ligados a priorización: `AUC`, `recall`, `specificity`, tradeoff por umbral y costo de falsos negativos.
 
 ## Por qué replay determinista del mejor experimento
 Los mejores parámetros de `Optuna` en los notebooks originales forman parte del resultado histórico del proyecto. Para una pieza de portafolio, lo importante era dejar:

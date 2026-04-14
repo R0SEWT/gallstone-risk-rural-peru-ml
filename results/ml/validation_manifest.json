@@ -1,0 +1,47 @@
+{
+  "paper_reported_accuracy": 0.8542,
+  "release_dataset_shape": [
+    319,
+    39
+  ],
+  "release_class_counts": {
+    "0": 161,
+    "1": 158
+  },
+  "artifacts": {
+    "full_summary": "results/ml/full_repeated_cv_summary.csv",
+    "rural_summary": "results/ml/rural_repeated_cv_summary.csv",
+    "feature_scheme_summary": "results/ml/rural_feature_scheme_summary.csv",
+    "threshold_table": "results/ml/rural_threshold_table.csv",
+    "feature_stability": "results/ml/rural_feature_stability.csv"
+  },
+  "recommended_rural_thresholds_preview": [
+    {
+      "threshold": 0.2,
+      "recall": 0.943,
+      "specificity": 0.205,
+      "precision": 0.5379,
+      "balanced_accuracy": 0.574,
+      "false_negatives": 9,
+      "false_positives": 128
+    },
+    {
+      "threshold": 0.25,
+      "recall": 0.9177,
+      "specificity": 0.3292,
+      "precision": 0.5731,
+      "balanced_accuracy": 0.6235,
+      "false_negatives": 13,
+      "false_positives": 108
+    },
+    {
+      "threshold": 0.3,
+      "recall": 0.8861,
+      "specificity": 0.4224,
+      "precision": 0.6009,
+      "balanced_accuracy": 0.6542,
+      "false_negatives": 18,
+      "false_positives": 93
+    }
+  ]
+}

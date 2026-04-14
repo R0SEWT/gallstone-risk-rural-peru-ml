@@ -1,0 +1,4 @@
+scenario,model,accuracy_mean,accuracy_std,roc_auc_mean,roc_auc_std,pr_auc_mean,pr_auc_std,precision_mean,precision_std,recall_mean,recall_std,f1_mean,f1_std,balanced_accuracy_mean,balanced_accuracy_std,specificity_mean,specificity_std,brier_score_mean,brier_score_std
+rural_feature_schemes,ANOVA15 + ElasticNet LR,0.6803,0.06,0.736,0.0536,0.7801,0.0468,0.7249,0.0693,0.5702,0.1002,0.6354,0.0815,0.6796,0.0596,0.789,0.0535,0.2006,0.0183
+rural_feature_schemes,All 25 + ElasticNet LR,0.6981,0.0355,0.7481,0.0487,0.7927,0.042,0.7513,0.0446,0.5868,0.0682,0.6566,0.0482,0.6972,0.0353,0.8076,0.0494,0.199,0.0205
+rural_feature_schemes,L1 select + LR,0.6741,0.0615,0.7332,0.0519,0.774,0.0428,0.7127,0.0834,0.5764,0.094,0.6342,0.0798,0.6734,0.0613,0.7705,0.0722,0.2032,0.0189
