@@ -39,6 +39,7 @@ Convenciones de codificación:
 - Gender: 1 = hombre, 0 = mujer
 - Para las demás condiciones: 1 = sí, 0 = no
 - Age en años enteros, Height en cm, Weight en kg
+- Si el paciente da la estatura en metros, conviértela a centímetros antes del JSON final
 
 Empieza saludando brevemente al paciente y preguntando por su edad.`;
 
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
   });
 
   const result = streamText({
-    model: deepseek("deepseek-chat"),
+    model: deepseek.chat("deepseek-chat"),
     system: SYSTEM_PROMPT,
     messages,
     temperature: 0.6,

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { generateBioimpedance } from "@/lib/api";
+import { areDemographicsEqual, coerceDemographics } from "@/lib/demographics";
 import { useDemoStore } from "@/lib/store";
 import { FEATURE_LABELS, type Bioimpedance } from "@/lib/types";
 
@@ -16,7 +17,7 @@ const BIO_ORDER: (keyof Bioimpedance)[] = [
 export default function MedicionPage() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
-  const { demographics, setBioimpedance } = useDemoStore();
+  const { demographics, setDemographics, setBioimpedance } = useDemoStore();
   const [bio, setBio] = useState<Bioimpedance | null>(null);
   const [revealed, setRevealed] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -26,19 +27,33 @@ export default function MedicionPage() {
       router.replace("/consulta");
       return;
     }
+
+    const normalized = coerceDemographics(demographics);
+    if (!normalized) {
+      setError(
+        "No se pudieron validar los datos de la consulta. Vuelve e ingrésalos de nuevo.",
+      );
+      return;
+    }
+
+    if (!areDemographicsEqual(demographics, normalized)) {
+      setDemographics(normalized);
+      return;
+    }
+
     generateBioimpedance({
-      age: demographics.Age,
-      gender: demographics.Gender,
-      height: demographics.Height,
-      weight: demographics.Weight,
-      bmi: demographics.BMI,
+      age: normalized.Age,
+      gender: normalized.Gender,
+      height: normalized.Height,
+      weight: normalized.Weight,
+      bmi: normalized.BMI,
     })
       .then((r) => {
         setBio(r.features);
         setBioimpedance(r.features);
       })
       .catch((e) => setError(e.message));
-  }, [demographics, router, setBioimpedance]);
+  }, [demographics, router, setBioimpedance, setDemographics]);
 
   useEffect(() => {
     if (!bio) return;

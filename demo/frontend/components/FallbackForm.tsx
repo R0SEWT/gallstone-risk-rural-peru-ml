@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { coerceDemographics } from "@/lib/demographics";
 import type { Demographics } from "@/lib/types";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function FallbackForm({ onSubmit }: Props) {
+  const [error, setError] = useState<string | null>(null);
   const [age, setAge] = useState("45");
   const [gender, setGender] = useState("1");
   const [height, setHeight] = useState("165");
@@ -20,21 +22,25 @@ export function FallbackForm({ onSubmit }: Props) {
 
   function handle(e: React.FormEvent) {
     e.preventDefault();
-    const h = Number(height);
-    const w = Number(weight);
-    const bmi = h > 0 ? w / Math.pow(h / 100, 2) : 0;
-    onSubmit({
+    const demographics = coerceDemographics({
       Age: Number(age),
       Gender: Number(gender),
-      Height: h,
-      Weight: w,
-      BMI: Number(bmi.toFixed(2)),
+      Height: Number(height),
+      Weight: Number(weight),
       Comorbidity: Number(comorbidity),
       CAD: Number(cad),
       Hypothyroidism: Number(hypo),
       Hyperlipidemia: Number(hyper),
       DM: Number(dm),
     });
+
+    if (!demographics) {
+      setError("Revisa estatura y peso. Los datos están fuera de rango.");
+      return;
+    }
+
+    setError(null);
+    onSubmit(demographics);
   }
 
   return (
@@ -42,6 +48,11 @@ export function FallbackForm({ onSubmit }: Props) {
       onSubmit={handle}
       className="grid gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 md:grid-cols-2"
     >
+      {error && (
+        <div className="md:col-span-2 rounded-lg bg-rose-50 p-3 text-sm text-rose-700 ring-1 ring-rose-200">
+          {error}
+        </div>
+      )}
       <div>
         <label className="text-xs font-medium text-slate-600">Edad</label>
         <input

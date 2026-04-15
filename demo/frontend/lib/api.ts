@@ -1,10 +1,18 @@
 import type { Bioimpedance, ModelInfo, RiskLevel } from "./types";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL?.trim() ||
+  (process.env.NODE_ENV === "development" ? "http://localhost:8000" : "");
+
+function getApiUrl() {
+  if (!API_URL) {
+    throw new Error("NEXT_PUBLIC_API_URL is not configured");
+  }
+  return API_URL;
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(`${getApiUrl()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -62,5 +70,6 @@ export function getModelInfo() {
 }
 
 export function warmUp() {
+  if (!API_URL) return Promise.resolve(null);
   return fetch(`${API_URL}/health`, { cache: "no-store" }).catch(() => null);
 }

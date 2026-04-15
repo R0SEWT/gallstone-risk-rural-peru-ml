@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FallbackForm } from "@/components/FallbackForm";
+import { coerceDemographics } from "@/lib/demographics";
 import { useDemoStore } from "@/lib/store";
 import type { Demographics } from "@/lib/types";
 
@@ -80,22 +81,21 @@ export default function ConsultaPage() {
         setFailures(0);
 
         const extracted = tryExtract(full);
-        if (extracted && extracted.Age && extracted.Height && extracted.Weight) {
-          const h = Number(extracted.Height);
-          const w = Number(extracted.Weight);
-          const bmi = h > 0 ? w / Math.pow(h / 100, 2) : 0;
-          handleDemographics({
-            Age: Number(extracted.Age),
-            Gender: Number(extracted.Gender ?? 0),
-            Height: h,
-            Weight: w,
-            BMI: Number(bmi.toFixed(2)),
-            Comorbidity: Number(extracted.Comorbidity ?? 0),
-            CAD: Number(extracted.CAD ?? 0),
-            Hypothyroidism: Number(extracted.Hypothyroidism ?? 0),
-            Hyperlipidemia: Number(extracted.Hyperlipidemia ?? 0),
-            DM: Number(extracted.DM ?? 0),
-          });
+        if (extracted) {
+          const normalized = coerceDemographics(extracted);
+          if (normalized) {
+            handleDemographics(normalized);
+          } else {
+            setMessages((m) => [
+              ...m,
+              {
+                role: "assistant",
+                content:
+                  "No pude validar bien la estatura o el peso. Completa el formulario manual para continuar.",
+              },
+            ]);
+            setShowFallback(true);
+          }
         }
       } catch (e) {
         setFailures((f) => {
