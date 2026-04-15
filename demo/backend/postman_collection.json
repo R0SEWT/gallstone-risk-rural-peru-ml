@@ -1,0 +1,352 @@
+{
+  "info": {
+    "name": "Gallstone Demo API",
+    "description": "Colección de validación para el backend FastAPI del demo rural de colelitiasis. Usa la variable de colección `baseUrl` para alternar entre local y producción (Railway).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "gallstone-demo-backend-validation"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Liveness + verifica que el pipeline sklearn y el TreeExplainer de SHAP se cargaron en startup."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('status ok', () => pm.expect(body.status).to.eql('ok'));",
+              "pm.test('model_loaded true', () => pm.expect(body.model_loaded).to.eql(true));",
+              "pm.test('explainer_loaded true', () => pm.expect(body.explainer_loaded).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Model info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/model/info",
+          "host": ["{{baseUrl}}"],
+          "path": ["model", "info"]
+        },
+        "description": "Devuelve el JSON de `figures/rural_metrics.json` — métricas canónicas del escenario rural (Accuracy 0.7708, AUC 0.8138)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('scenario rural', () => pm.expect(body.scenario).to.eql('rural'));",
+              "pm.test('feature_count 25', () => pm.expect(body.feature_count).to.eql(25));",
+              "pm.test('accuracy ~0.7708', () => pm.expect(body.optimized_accuracy).to.be.closeTo(0.7708, 0.001));",
+              "pm.test('auc ~0.8138', () => pm.expect(body.optimized_auc).to.be.closeTo(0.8138, 0.001));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predict rural — hombre 45 años IMC 25.7",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"features\": {\n    \"Age\": 45,\n    \"Gender\": 1,\n    \"Comorbidity\": 0,\n    \"CAD\": 0,\n    \"Hypothyroidism\": 0,\n    \"Hyperlipidemia\": 0,\n    \"DM\": 0,\n    \"Height\": 165,\n    \"Weight\": 70,\n    \"BMI\": 25.7,\n    \"TBW\": 35,\n    \"ECW\": 15,\n    \"ICW\": 20,\n    \"ECF_TBW\": 0.43,\n    \"TBFR\": 25,\n    \"LM\": 48,\n    \"Protein\": 9,\n    \"VFR\": 8,\n    \"BM\": 2.8,\n    \"MM\": 45,\n    \"Obesity\": 0,\n    \"TFC\": 12,\n    \"VFA\": 85,\n    \"VMA\": 60,\n    \"HFA\": 55\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/predict/rural",
+          "host": ["{{baseUrl}}"],
+          "path": ["predict", "rural"]
+        },
+        "description": "Caso con valores de bioimpedancia fuera de rangos fisiológicos — el modelo devuelve probabilidad alta."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('probability in [0,1]', () => {",
+              "  pm.expect(body.probability).to.be.within(0, 1);",
+              "});",
+              "pm.test('risk_level valid', () => {",
+              "  pm.expect(['bajo','moderado','alto']).to.include(body.risk_level);",
+              "});",
+              "pm.test('threshold_used 0.45', () => {",
+              "  pm.expect(body.threshold_used).to.eql(0.45);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predict rural — mujer 30 años sano",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"features\": {\n    \"Age\": 30,\n    \"Gender\": 0,\n    \"Comorbidity\": 0,\n    \"CAD\": 0,\n    \"Hypothyroidism\": 0,\n    \"Hyperlipidemia\": 0,\n    \"DM\": 0,\n    \"Height\": 160,\n    \"Weight\": 55,\n    \"BMI\": 21.48,\n    \"TBW\": 30.5,\n    \"ECW\": 12.8,\n    \"ICW\": 17.7,\n    \"ECF_TBW\": 0.42,\n    \"TBFR\": 24.0,\n    \"LM\": 40.2,\n    \"Protein\": 8.1,\n    \"VFR\": 3.5,\n    \"BM\": 2.2,\n    \"MM\": 38.0,\n    \"Obesity\": 0,\n    \"TFC\": 13.2,\n    \"VFA\": 45.0,\n    \"VMA\": 40.0,\n    \"HFA\": 2.0\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/predict/rural",
+          "host": ["{{baseUrl}}"],
+          "path": ["predict", "rural"]
+        },
+        "description": "Perfil de mujer joven con valores normales — se espera baja probabilidad."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('probability in [0,1]', () => pm.expect(body.probability).to.be.within(0, 1));",
+              "pm.test('risk_level valid', () => pm.expect(['bajo','moderado','alto']).to.include(body.risk_level));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predict rural — 400 cuando falta feature",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"features\": {\n    \"Age\": 45,\n    \"Gender\": 1\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/predict/rural",
+          "host": ["{{baseUrl}}"],
+          "path": ["predict", "rural"]
+        },
+        "description": "Valida que el validator Pydantic rechaza payloads incompletos con 422."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Explain rural",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"features\": {\n    \"Age\": 45,\n    \"Gender\": 1,\n    \"Comorbidity\": 0,\n    \"CAD\": 0,\n    \"Hypothyroidism\": 0,\n    \"Hyperlipidemia\": 0,\n    \"DM\": 0,\n    \"Height\": 165,\n    \"Weight\": 70,\n    \"BMI\": 25.7,\n    \"TBW\": 35,\n    \"ECW\": 15,\n    \"ICW\": 20,\n    \"ECF_TBW\": 0.43,\n    \"TBFR\": 25,\n    \"LM\": 48,\n    \"Protein\": 9,\n    \"VFR\": 8,\n    \"BM\": 2.8,\n    \"MM\": 45,\n    \"Obesity\": 0,\n    \"TFC\": 12,\n    \"VFA\": 85,\n    \"VMA\": 60,\n    \"HFA\": 55\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/explain/rural",
+          "host": ["{{baseUrl}}"],
+          "path": ["explain", "rural"]
+        },
+        "description": "Devuelve los 25 valores SHAP para el mismo payload usado en Predict."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('shap_values has 25 keys', () => {",
+              "  pm.expect(Object.keys(body.shap_values).length).to.eql(25);",
+              "});",
+              "pm.test('shap_values are numeric', () => {",
+              "  Object.values(body.shap_values).forEach(v => pm.expect(typeof v).to.eql('number'));",
+              "});",
+              "pm.test('base_value numeric', () => pm.expect(typeof body.base_value).to.eql('number'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate bioimpedance — hombre 45 años",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": 45,\n  \"gender\": 1,\n  \"height\": 170,\n  \"weight\": 75,\n  \"bmi\": 25.95\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/generate/bioimpedance",
+          "host": ["{{baseUrl}}"],
+          "path": ["generate", "bioimpedance"]
+        },
+        "description": "Genera 15 variables de bioimpedancia usando template (age_bucket × gender) + perturbación ±3% determinista por semilla."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "const expected = ['TBW','ECW','ICW','ECF_TBW','TBFR','LM','Protein','VFR','BM','MM','Obesity','TFC','VFA','VMA','HFA'];",
+              "pm.test('returns 15 features', () => {",
+              "  pm.expect(Object.keys(body.features).length).to.eql(15);",
+              "});",
+              "pm.test('all 15 bioimpedance keys present', () => {",
+              "  expected.forEach(k => pm.expect(body.features).to.have.property(k));",
+              "});",
+              "pm.test('all values numeric', () => {",
+              "  Object.values(body.features).forEach(v => pm.expect(typeof v).to.eql('number'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate bioimpedance — mujer 60+",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": 62,\n  \"gender\": 0,\n  \"height\": 158,\n  \"weight\": 68,\n  \"bmi\": 27.24\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/generate/bioimpedance",
+          "host": ["{{baseUrl}}"],
+          "path": ["generate", "bioimpedance"]
+        },
+        "description": "Valida que el lookup (60+_0) funciona — bucket extremo del template JSON."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('returns 15 features', () => pm.expect(Object.keys(body.features).length).to.eql(15));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Flujo end-to-end (generate → predict → explain)",
+      "description": "Ejecuta este item manualmente después de correr el resto — usa el collection runner para disparar en cadena.",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": 50,\n  \"gender\": 1,\n  \"height\": 170,\n  \"weight\": 82,\n  \"bmi\": 28.37\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/generate/bioimpedance",
+          "host": ["{{baseUrl}}"],
+          "path": ["generate", "bioimpedance"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// 1. Guarda las 15 variables de bioimpedancia generadas",
+              "const bio = pm.response.json().features;",
+              "",
+              "// 2. Arma el payload completo (demographics + bioimpedance)",
+              "const features = {",
+              "  Age: 50, Gender: 1, Comorbidity: 0, CAD: 0,",
+              "  Hypothyroidism: 0, Hyperlipidemia: 0, DM: 0,",
+              "  Height: 170, Weight: 82, BMI: 28.37,",
+              "  ...bio",
+              "};",
+              "",
+              "// 3. POST /predict/rural",
+              "pm.sendRequest({",
+              "  url: pm.variables.get('baseUrl') + '/predict/rural',",
+              "  method: 'POST',",
+              "  header: { 'Content-Type': 'application/json' },",
+              "  body: { mode: 'raw', raw: JSON.stringify({ features }) }",
+              "}, (err, res) => {",
+              "  pm.test('predict 200', () => pm.expect(res.code).to.eql(200));",
+              "  const pred = res.json();",
+              "  pm.test('probability numeric', () => pm.expect(typeof pred.probability).to.eql('number'));",
+              "  console.log('prob:', pred.probability, 'risk:', pred.risk_level);",
+              "});",
+              "",
+              "// 4. POST /explain/rural",
+              "pm.sendRequest({",
+              "  url: pm.variables.get('baseUrl') + '/explain/rural',",
+              "  method: 'POST',",
+              "  header: { 'Content-Type': 'application/json' },",
+              "  body: { mode: 'raw', raw: JSON.stringify({ features }) }",
+              "}, (err, res) => {",
+              "  pm.test('explain 200', () => pm.expect(res.code).to.eql(200));",
+              "  const exp = res.json();",
+              "  pm.test('shap_values 25', () => pm.expect(Object.keys(exp.shap_values).length).to.eql(25));",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

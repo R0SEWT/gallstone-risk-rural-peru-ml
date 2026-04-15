@@ -1,0 +1,25 @@
+[project]
+name = "winter-project"
+version = "0.1.0"
+description = "Gallstone disease prediction ML case study (replica + rural adaptation)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "catboost==1.2.10",
+    "imbalanced-learn==0.14.0",
+    "joblib>=1.3",
+    "matplotlib==3.10.7",
+    "nbclient==0.10.4",
+    "nbconvert==7.17.1",
+    "nbformat==5.10.4",
+    "numpy==2.3.1",
+    "openpyxl==3.1.5",
+    "pandas==2.3.0",
+    "scikit-learn==1.7.2",
+    "seaborn==0.13.2",
+    "shap==0.51.0",
+    "xgboost==3.1.1",
+]
+
+[tool.uv]
+package = false
