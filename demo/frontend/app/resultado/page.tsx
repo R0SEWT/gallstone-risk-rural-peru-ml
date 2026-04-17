@@ -1,28 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { ActShell } from "@/components/ActShell";
 import { RiskGauge } from "@/components/RiskGauge";
 import { ShapWaterfall } from "@/components/ShapWaterfall";
 import {
-  explainRural,
-  getModelInfo,
-  predictRural,
-} from "@/lib/api";
+  ACT_NOTES,
+  HOME_SCENARIOS,
+  LIMITATIONS,
+  RESULT_INTERPRETATION,
+} from "@/lib/content";
+import { explainRural, getModelInfo, predictRural } from "@/lib/api";
+import { FEATURE_LABELS, type ModelInfo } from "@/lib/types";
 import { useDemoStore } from "@/lib/store";
-import type { ModelInfo } from "@/lib/types";
 
 export default function ResultadoPage() {
   const router = useRouter();
-  const {
-    demographics,
-    bioimpedance,
-    prediction,
-    setPrediction,
-    reset,
-  } = useDemoStore();
+  const { demographics, bioimpedance, prediction, setPrediction, reset } =
+    useDemoStore();
   const [error, setError] = useState<string | null>(null);
   const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
   const [showTechDetails, setShowTechDetails] = useState(false);
@@ -53,191 +50,327 @@ export default function ResultadoPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold text-rose-600">
+      <ActShell
+        step="resultado"
+        eyebrow="Acto 03 · Resultado"
+        title="La lectura final se interrumpió."
+        intro="El frontend no pudo cerrar la predicción. Reinicia el flujo para reconstruir el caso."
+        note={ACT_NOTES.resultado}
+      >
+        <div className="border-l-2 border-[var(--danger)] pl-6">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--danger)]">
             Error de conexión
-          </h1>
-          <p className="mt-3 text-slate-600">{error}</p>
-          <Link
-            href="/"
-            className="mt-6 inline-block rounded-lg bg-slate-900 px-5 py-2 text-white"
-          >
-            Volver al inicio
-          </Link>
+          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--muted-strong)]">
+            {error}
+          </p>
         </div>
-      </main>
+      </ActShell>
     );
   }
 
   if (!prediction) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-500 animate-pulse">
-          Calculando predicción…
+      <ActShell
+        step="resultado"
+        eyebrow="Acto 03 · Resultado"
+        title="El modelo está leyendo el caso."
+        intro="La demo combina entrevista y bioimpedancia en una lectura de riesgo explicable."
+        note={ACT_NOTES.resultado}
+      >
+        <div className="flex flex-col items-center py-32">
+          <motion.span
+            aria-hidden
+            className="block h-[2px] w-16 bg-[var(--accent)]"
+            animate={{ scaleX: [0.2, 1, 0.2], opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ transformOrigin: "center" }}
+          />
+          <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--muted)]">
+            Procesando predicción + SHAP
+          </p>
         </div>
-      </main>
+      </ActShell>
     );
   }
 
+  const interpretation = RESULT_INTERPRETATION[prediction.risk_level];
+  const topDrivers = Object.entries(prediction.shap_values)
+    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+    .slice(0, 4);
+
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10 md:py-16">
-      <div className="mx-auto max-w-5xl">
-        <motion.header
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex items-center justify-between"
-        >
+    <ActShell
+      step="resultado"
+      eyebrow="Acto 03 · Resultado"
+      title="No es un diagnóstico. Es una lectura para decidir mejor."
+      intro="25 variables convertidas en una interpretación operativa. La prioridad es que el usuario entienda qué significa el riesgo y por qué."
+      note={ACT_NOTES.resultado}
+      aside={
+        <>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Acto 3 · Resultado
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+              Estado del caso
             </p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-900">
-              Evaluación completada
-            </h1>
+            <p className="mt-6 font-sans font-light text-6xl leading-none tracking-[-0.03em] text-[var(--foreground-strong)]">
+              {(prediction.probability * 100).toFixed(0)}
+              <span className="font-mono text-xl align-top text-[var(--muted)]">
+                %
+              </span>
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--muted-strong)]">
+              Riesgo estimado rural. Para priorizar, no para confirmar.
+            </p>
+            <button
+              onClick={() => {
+                reset();
+                router.push("/");
+              }}
+              className="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[var(--hairline-strong)] px-6 font-mono text-[11px] uppercase tracking-[0.26em] text-[var(--foreground)] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            >
+              Nueva evaluación →
+            </button>
           </div>
-          <button
-            onClick={() => {
-              reset();
-              router.push("/");
-            }}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-white"
+
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+              Límites vigentes
+            </p>
+            <ul className="mt-6 space-y-5 text-[13px] leading-relaxed text-[var(--muted-strong)]">
+              {LIMITATIONS.map((item) => (
+                <li key={item} className="flex gap-4">
+                  <span className="mt-1 h-px w-6 bg-[var(--warning)]" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      }
+    >
+      <section className="grid grid-cols-1 gap-16 border-b border-[var(--hairline)] pb-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+        <RiskGauge
+          probability={prediction.probability}
+          riskLevel={prediction.risk_level}
+        />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+            Lectura principal
+          </p>
+          <h2
+            className="mt-8 font-sans font-light leading-[1.05] tracking-[-0.03em] text-[var(--foreground-strong)]"
+            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
           >
-            Nueva evaluación
-          </button>
-        </motion.header>
+            {interpretation.title}
+          </h2>
+          <p className="mt-8 text-[15px] leading-relaxed text-[var(--muted-strong)] md:text-base">
+            {interpretation.summary}
+          </p>
+          <p className="mt-8 border-l border-[var(--accent)] pl-5 font-sans text-lg font-normal italic leading-[1.5] text-[var(--muted-strong)] md:text-xl">
+            {interpretation.emphasis}
+          </p>
 
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid gap-6 rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 md:grid-cols-[auto_1fr] md:items-center"
-        >
-          <RiskGauge
-            probability={prediction.probability}
-            riskLevel={prediction.risk_level}
-          />
-          <div className="space-y-3 text-sm text-slate-700">
-            <p>
-              El modelo estima una probabilidad de{" "}
-              <strong>{(prediction.probability * 100).toFixed(1)}%</strong>{" "}
-              de presentar colelitiasis con base en las 25 variables
-              recolectadas (9 demográficas + 15 de bioimpedancia + BMI).
+          <div className="mt-10 grid grid-cols-2 gap-8 border-t border-[var(--hairline)] pt-8">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+                Entrada
+              </p>
+              <p className="mt-3 font-sans font-light text-2xl tracking-[-0.02em] text-[var(--foreground-strong)]">
+                25 variables
+              </p>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--muted-strong)]">
+                9 demo + 15 bio + BMI
+              </p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+                Uso
+              </p>
+              <p className="mt-3 font-sans font-light text-2xl tracking-[-0.02em] text-[var(--foreground-strong)]">
+                Tamizaje
+              </p>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--muted-strong)]">
+                No reemplaza ecografía
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      <section className="border-b border-[var(--hairline)] py-20">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--muted)]">
+              Escenario
             </p>
-            <p className="text-slate-500">
-              Este es un resultado orientativo y no reemplaza la evaluación
-              clínica con un médico.
+            <p className="mt-6 font-sans font-light text-[1.75rem] leading-[1.15] tracking-[-0.02em] text-[var(--foreground-strong)] md:text-[2rem]">
+              La predicción vive en la <em className="italic font-light text-[var(--accent)]">tercera</em> columna.
             </p>
           </div>
-        </motion.section>
+          <div className="grid grid-cols-1 gap-6 md:col-span-8 md:grid-cols-3 md:gap-4">
+            {HOME_SCENARIOS.map((scenario) => {
+              const active = scenario.id === "rural";
+              return (
+                <div
+                  key={scenario.id}
+                  className={`flex flex-col border-t py-8 ${
+                    active
+                      ? "border-[var(--accent)]"
+                      : "border-[var(--hairline-strong)]"
+                  }`}
+                >
+                  <p
+                    className="font-mono text-[10px] uppercase tracking-[0.28em]"
+                    style={{
+                      color: active ? "var(--accent)" : "var(--muted)",
+                    }}
+                  >
+                    {scenario.eyebrow}
+                  </p>
+                  <p
+                    className={`mt-5 font-sans text-lg font-normal leading-tight tracking-[-0.01em] ${
+                      active
+                        ? "text-[var(--foreground-strong)]"
+                        : "text-[var(--muted-strong)]"
+                    }`}
+                  >
+                    {scenario.title}
+                  </p>
+                  <p
+                    className={`mt-auto pt-6 font-mono text-[11px] uppercase tracking-[0.22em] ${
+                      active ? "text-[var(--accent)]" : "text-[var(--muted)]"
+                    }`}
+                  >
+                    {scenario.metricValue}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="mt-6 rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200"
-        >
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Variables que más influyeron
+      <section className="py-20">
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-[1.3fr_1fr]">
+          <article>
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--muted)]">
+              Explicabilidad · SHAP
+            </p>
+            <h2
+              className="mt-6 font-sans font-light leading-[1.08] tracking-[-0.03em] text-[var(--foreground-strong)]"
+              style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)" }}
+            >
+              Variables que movieron la lectura.
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Valores SHAP — muestran el aporte de cada variable a la
-              predicción.
+            <p className="mt-6 max-w-lg text-sm leading-relaxed text-[var(--muted-strong)]">
+              Qué factores empujaron el resultado hacia más o menos riesgo dentro
+              del escenario rural.
             </p>
-          </div>
-          <ShapWaterfall shapValues={prediction.shap_values} />
-        </motion.section>
+            <div className="mt-12">
+              <ShapWaterfall shapValues={prediction.shap_values} />
+            </div>
+          </article>
 
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-6 grid gap-6 md:grid-cols-2"
-        >
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
-              Laboratorio tradicional
-            </h3>
-            <p className="mt-2 text-2xl font-bold text-slate-900">1–3 días</p>
-            <ul className="mt-3 space-y-1 text-sm text-slate-600">
-              <li>· Ecografía + panel lipídico</li>
-              <li>· Requiere centro médico</li>
-              <li>· Costo: $$</li>
-            </ul>
-          </div>
-          <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm ring-1 ring-emerald-200">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-700">
-              Bioimpedancia + ML
-            </h3>
-            <p className="mt-2 text-2xl font-bold text-emerald-900">
-              8 segundos
-            </p>
-            <ul className="mt-3 space-y-1 text-sm text-emerald-800">
-              <li>· Báscula portátil de bioimpedancia</li>
-              <li>· Aplicable en campo / zonas rurales</li>
-              <li>· Costo: $</li>
-            </ul>
-          </div>
-        </motion.section>
+          <aside className="space-y-16">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+                Drivers principales
+              </p>
+              <div className="mt-8 space-y-6">
+                {topDrivers.map(([feature, value], index) => {
+                  const positive = value >= 0;
+                  return (
+                    <div
+                      key={feature}
+                      className="border-t border-[var(--hairline)] pt-5"
+                    >
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-[var(--muted)]">
+                          {`0${index + 1}`.padStart(2, "0")}
+                        </span>
+                        <span
+                          className="font-mono text-xs"
+                          style={{
+                            color: positive ? "var(--danger)" : "var(--success)",
+                          }}
+                        >
+                          {positive ? "+" : ""}
+                          {value.toFixed(3)}
+                        </span>
+                      </div>
+                      <p className="mt-3 font-sans text-xl font-medium leading-tight tracking-[-0.01em] text-[var(--foreground-strong)]">
+                        {FEATURE_LABELS[feature] ?? feature}
+                      </p>
+                      <p
+                        className="mt-2 font-mono text-[10px] uppercase tracking-[0.24em]"
+                        style={{
+                          color: positive ? "var(--danger)" : "var(--accent)",
+                        }}
+                      >
+                        {positive ? "Empuja ↑" : "Reduce ↓"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55 }}
-          className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200"
-        >
-          <button
-            onClick={() => setShowTechDetails((s) => !s)}
-            className="flex w-full items-center justify-between text-left"
-          >
-            <h3 className="text-sm font-semibold text-slate-900">
-              Detalles técnicos del modelo
-            </h3>
-            <span className="text-xs text-slate-500">
-              {showTechDetails ? "Ocultar" : "Mostrar"}
-            </span>
-          </button>
-          {showTechDetails && modelInfo && (
-            <dl className="mt-4 grid gap-4 text-sm text-slate-600 md:grid-cols-2">
-              <div>
-                <dt className="text-xs uppercase text-slate-400">Modelo</dt>
-                <dd className="font-medium text-slate-800">
-                  Gradient Boosting (SMOTE + Optuna)
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase text-slate-400">Dataset</dt>
-                <dd className="font-medium text-slate-800">
-                  {modelInfo.dataset_shape[0]} casos · UCI Gallstone
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase text-slate-400">Accuracy</dt>
-                <dd className="font-medium text-slate-800">
-                  {(modelInfo.optimized_accuracy * 100).toFixed(2)}%
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase text-slate-400">AUC</dt>
-                <dd className="font-medium text-slate-800">
-                  {modelInfo.optimized_auc.toFixed(4)}
-                </dd>
-              </div>
-              <div className="md:col-span-2">
-                <dt className="text-xs uppercase text-slate-400">Variables</dt>
-                <dd className="font-medium text-slate-800">
-                  {modelInfo.feature_count} (sin análisis de sangre ni lípidos)
-                </dd>
-              </div>
-            </dl>
-          )}
-        </motion.section>
+            <details
+              open={showTechDetails}
+              onToggle={(e) => setShowTechDetails(e.currentTarget.open)}
+              className="group"
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-4 border-t border-[var(--hairline)] pt-6">
+                <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+                  Capa técnica
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-[var(--muted-strong)] transition group-open:text-[var(--accent)]">
+                  {showTechDetails ? "− Ocultar" : "+ Mostrar"}
+                </span>
+              </summary>
 
-        <footer className="mt-10 text-center text-xs text-slate-400">
-          Proyecto académico · UPC 2024 · No sustituye diagnóstico médico
-        </footer>
-      </div>
-    </main>
+              <dl className="mt-8 grid grid-cols-1 gap-6 text-sm">
+                {[
+                  [
+                    "Modelo",
+                    modelInfo?.optimized_model_name ??
+                      "Gradient Boosting + SMOTE + Optuna",
+                  ],
+                  [
+                    "Accuracy rural",
+                    modelInfo
+                      ? `${(modelInfo.optimized_accuracy * 100).toFixed(2)}%`
+                      : "77.08%",
+                  ],
+                  [
+                    "AUC rural",
+                    modelInfo ? modelInfo.optimized_auc.toFixed(4) : "0.8138",
+                  ],
+                  ["Referencia", "Paper: 88.54% · 0.9280"],
+                  ["Dataset", "UCI Gallstone · 319 · Ankara"],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex items-baseline justify-between gap-6 border-b border-[var(--hairline)] pb-3"
+                  >
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--muted)]">
+                      {label}
+                    </dt>
+                    <dd className="font-mono text-xs text-[var(--foreground)]">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          </aside>
+        </div>
+      </section>
+    </ActShell>
   );
 }

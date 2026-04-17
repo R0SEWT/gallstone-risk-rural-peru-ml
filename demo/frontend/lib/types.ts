@@ -79,9 +79,12 @@ export interface ModelInfo {
   scenario: string;
   dataset_shape: [number, number];
   feature_count: number;
+  optimized_model_name?: string;
   optimized_accuracy: number;
   optimized_auc: number;
   best_benchmark_name: string;
   best_benchmark_accuracy: number;
   best_benchmark_auc: number;
+  selected_features?: string[];
+  excluded_features?: string[];
 }
