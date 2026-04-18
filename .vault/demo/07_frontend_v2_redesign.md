@@ -7,7 +7,7 @@ status: active
 
 # Frontend v2 — Reference
 
-Estado actual: `demo/frontend/` corre en **light documental + sans-serif + ilustración SVG anatómica**. La versión anterior (dark-editorial con Instrument Serif) fue reemplazada en `bddb6e1`. No existe dark mode.
+Estado actual: `demo/frontend/` corre en **light documental + sans-serif + ilustración SVG anatómica**, con **dark mode** vía toggle tri-state (system / light / dark). La versión anterior (dark-editorial con Instrument Serif) fue reemplazada en `bddb6e1`.
 
 Stack runtime: Next.js 16.2.3 (App Router, Turbopack), React 19.2.4, Tailwind v4, Framer Motion 12.38.0, Lenis 1.3.11, Zustand 5. DOM/flujo demo sin cambios: Zustand store, endpoint `/api/chat`, backend FastAPI en HuggingFace Spaces.
 
@@ -62,7 +62,31 @@ Todo path relativo a `demo/frontend/`.
 | `--font-sans` | `var(--font-geist-sans)` | Display + cuerpo |
 | `--font-mono` | `var(--font-geist-mono)` | Labels, numeración, meta |
 
-`color-scheme: light`. Tailwind v4 `@theme inline` mapea `--color-*` a los mismos tokens (`globals.css:39-44`).
+`color-scheme: light` por defecto. Tailwind v4 `@theme inline` mapea `--color-*` a los mismos tokens (`globals.css:39-44`).
+
+### Dark mode — overrides
+
+Activado por `:root.dark` (explícito) o `@media (prefers-color-scheme: dark) :root:not(.light):not(.dark)` (system). Los tokens se redefinen con los mismos nombres, así que todo componente que use vars se adapta sin cambios.
+
+| Token | Valor dark |
+|-------|-----------|
+| `--background` | `#12100b` |
+| `--surface-0..3` | `#17130d / #1e1913 / #28221a / #352d22` |
+| `--foreground` | `#ece6d8` |
+| `--foreground-strong` | `#f5efe2` |
+| `--muted` | `#8a857a` |
+| `--muted-strong` | `#b5b0a3` |
+| `--hairline` | `rgba(236,230,216,0.10)` |
+| `--hairline-strong` | `rgba(236,230,216,0.22)` |
+| `--accent` | `#d76845` (terracota más cálida para contraste sobre oscuro) |
+| `--accent-strong` | `#e97b5a` |
+| `--accent-soft` | `rgba(215,104,69,0.14)` |
+| `--accent-glow` | `rgba(215,104,69,0.32)` |
+| `--accent-ink` | `#17110c` (texto oscuro sobre accent más claro) |
+| `--danger / --warning / --success` | `#d74f3e / #c48c1c / #3ea57a` |
+| `--noise-blend` | `screen` (light usa `multiply`) |
+
+Variables auxiliares que el background tintado consume: `--radial-accent-fog`, `--radial-ink-fog`, `--noise-blend`, `--noise-alpha`. Definidas en `:root` y redefinidas en el bloque dark.
 
 ---
 
@@ -91,7 +115,8 @@ Imports de fuentes: `app/layout.tsx` (solo `Geist_Sans` + `Geist_Mono`). `font-f
 | `ParallaxLayer` | `ParallaxLayer.tsx:12` | `{ children; speed?: number; className? }` (speed default 0.3). |
 | `HairlineDivider` | `HairlineDivider.tsx:11` | `{ orientation?: "horizontal"\|"vertical"; className?; delay?: number }` — scaleX/scaleY draw-in. Usa `--hairline-strong`. |
 | `SmoothScroll` | `SmoothScroll.tsx:6` | Sin props. Lenis global en `app/layout.tsx`. |
-| `GridBackground` | `GridBackground.tsx:1` | Sin props. Grid + noise + radiales tintados terracota. |
+| `GridBackground` | `GridBackground.tsx:1` | Sin props. Grid + noise + radiales tintados terracota. Usa `var(--radial-*-fog)` y clase `.noise-blend` para adaptarse a dark. |
+| `ThemeToggle` | `ThemeToggle.tsx` | Sin props. Botón fixed top-right que cicla `system → light → dark`. Persiste en `localStorage['theme']`. Montado en `app/layout.tsx` junto a `GridBackground`. |
 
 ---
 
@@ -139,7 +164,6 @@ No reintroducir sin refactor de toda la UI:
 | `Instrument_Serif` (import `next/font`) | Fuente descartada | `app/layout.tsx` no debe importarla |
 | `--font-instrument-serif`, `--font-serif` | Tokens borrados | `app/globals.css` no los define |
 | `SerifReveal` componente | Archivo borrado | `components/SerifReveal.tsx` no existe |
-| Dark mode / paleta oscura | Scope actual es light-only | `color-scheme: light` fijo en `globals.css` |
 
 ---
 
@@ -151,6 +175,8 @@ No reintroducir sin refactor de toda la UI:
 | Cambios a `NEXT_PUBLIC_API_URL` no surten efecto | Vars `NEXT_PUBLIC_*` están baked en build time | Rebuild + redeploy del frontend |
 | Animaciones rompen con `prefers-reduced-motion` | Contrato: toda animación debe tener fallback estático | Usar `useReducedMotion()` y degradar a estado final (patrón en todas las ilustraciones y en `SectionReveal`) |
 | Next.js 16 rompe convenciones del App Router | Breaking changes vs training data | Antes de tocar `app/layout.tsx`, `next/font`, routing: leer `node_modules/next/dist/docs/` (ver `demo/frontend/AGENTS.md`) |
+| Flash of wrong theme en primer paint | Next.js SSR no conoce preferencia del cliente | Inline script en `<head>` de `layout.tsx` aplica clase `.dark`/`.light` desde `localStorage` antes del paint. `<html suppressHydrationWarning>` requerido porque el script muta la clase antes de hydration. |
+| Nuevos componentes con `mix-blend-mode` u rgba literal | No se adaptan a dark | Usar `var(--radial-*-fog)` para tintes, clase `.noise-blend` para blend theme-aware, o tokens existentes |
 | Secrets en `.env.local` | Archivo ignorado por `.gitignore` raíz y `demo/frontend/.gitignore` | Confirmar con `git ls-files --error-unmatch demo/frontend/.env.local` → debe fallar |
 
 ---
