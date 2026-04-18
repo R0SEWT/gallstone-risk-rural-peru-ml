@@ -1,6 +1,6 @@
 ---
 purpose: Plan orquestador de la demo gamificada de screening. Mapa de fases, dependencias y stack.
-last_updated: 2026-04-12
+last_updated: 2026-04-17
 source_of_truth: .claude/plans/wild-crafting-fairy.md
 status: active
 ---
@@ -58,6 +58,7 @@ Fase 1 (Backend) ──→ Fase 2 (Acto 3: Resultados) ──→ Fase 3 (Acto 1:
 | Doc | Propósito |
 |-----|-----------|
 | [06_data_contracts.md](./06_data_contracts.md) | Tipos compartidos FE/BE (Pydantic + TypeScript). Única fuente de verdad para los 25 features y las respuestas de la API. |
+| [07_frontend_v2_redesign.md](./07_frontend_v2_redesign.md) | Reference del frontend v2: tokens, componentes compartidos, ilustraciones SVG, páginas, símbolos removidos y pitfalls. Consultable por agentes. |
 | [99_open_questions.md](./99_open_questions.md) | Decisiones pendientes detectadas durante la planificación. Revisar antes de arrancar cada fase. |
 
 ## Lógica de priorización
