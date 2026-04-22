@@ -167,41 +167,40 @@ def save_metrics_comparison_figure(
     rural_report_path: Path,
     output_path: Path,
 ) -> pd.DataFrame:
+    import seaborn as sns
     full_report = json.loads(full_report_path.read_text())
     rural_report = json.loads(rural_report_path.read_text())
     frame = _create_metrics_comparison_frame(full_report, rural_report)
 
-    fig, ax = plt.subplots(figsize=(11, 3.4))
-    ax.axis("off")
-    formatted = frame.copy()
-    formatted["Accuracy"] = formatted["Accuracy"].map(lambda value: f"{value:.4f}")
-    formatted["AUC"] = formatted["AUC"].map(lambda value: f"{value:.4f}")
-
-    table = ax.table(
-        cellText=formatted.values,
-        colLabels=formatted.columns,
-        cellLoc="center",
-        colLoc="center",
-        loc="center",
-    )
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1, 1.55)
-
-    for row_index in range(len(formatted) + 1):
-        for col_index in range(len(formatted.columns)):
-            cell = table[row_index, col_index]
-            if row_index == 0:
-                cell.set_text_props(weight="bold", color="white")
-                cell.set_facecolor("#0f4c5c")
-            elif row_index in (1, 2):
-                cell.set_facecolor("#edf6f9")
-            else:
-                cell.set_facecolor("#fff4e6")
-
-    ax.set_title("Resumen comparativo de métricas", pad=18, fontweight="bold")
+    sns.set_theme(style="whitegrid", rc={"axes.spines.top": False, "axes.spines.right": False})
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+    
+    # Plot Accuracy
+    sns.barplot(data=frame, x="Escenario", y="Accuracy", hue="Estrategia", ax=axes[0], palette="Blues_d")
+    axes[0].set_ylim(0.5, 1.0)
+    axes[0].set_title("Comparación de Accuracy", pad=15, fontweight="bold")
+    for i in axes[0].containers:
+        axes[0].bar_label(i, fmt='%.4f', label_type='edge', padding=3)
+    axes[0].set_xlabel("")
+    axes[0].get_legend().remove()
+    
+    # Plot AUC
+    sns.barplot(data=frame, x="Escenario", y="AUC", hue="Estrategia", ax=axes[1], palette="Oranges_d")
+    axes[1].set_ylim(0.5, 1.0)
+    axes[1].set_title("Comparación de AUC", pad=15, fontweight="bold")
+    for i in axes[1].containers:
+        axes[1].bar_label(i, fmt='%.4f', label_type='edge', padding=3)
+    axes[1].set_xlabel("")
+    
+    # Legend below figure
+    handles, labels = axes[1].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=2, bbox_to_anchor=(0.5, -0.05), frameon=False)
+    axes[1].get_legend().remove()
+        
+    plt.tight_layout()
+    fig.subplots_adjust(bottom=0.2)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=200)
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
     return frame
 

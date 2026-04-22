@@ -114,14 +114,15 @@ function Hero() {
       </motion.div>
 
       <div className="relative z-10 mt-16 flex flex-col gap-8 md:mt-20 md:flex-row md:items-end md:justify-between">
-        <motion.div
-          animate={reduce ? undefined : { y: [0, 8, 0] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--muted)]"
-        >
-          <span className="h-px w-12 bg-[var(--hairline-strong)]" />
-          Desliza para entrar
-        </motion.div>
+        <div className="max-w-md border-l border-[var(--hairline-strong)] pl-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+            Antes de entrar
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-[var(--muted-strong)]">
+            Demo de tamizaje, no de diagnóstico. Dataset UCI Gallstone, 319 casos,
+            Ankara. Rendimiento rural: AUC 0.8138 · Accuracy 77.08%.
+          </p>
+        </div>
 
         <div className="flex flex-wrap items-center gap-6">
           <MagneticButton href="/consulta">Simular visita médica</MagneticButton>
@@ -287,13 +288,21 @@ function RuralSection() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.26em] text-[var(--muted)]">
                   Variables lab eliminadas
                 </p>
-                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-xs text-[var(--muted-strong)]">
-                  {EXCLUDED_LAB_FEATURES.map((f) => (
-                    <span key={f} className="line-through decoration-[var(--accent)]/60">
-                      {f}
-                    </span>
-                  ))}
-                </div>
+                <p className="mt-4 text-sm leading-relaxed text-[var(--muted-strong)]">
+                  Se retiraron 13 variables de laboratorio para reducir fricción operativa.
+                </p>
+                <details className="mt-4 group">
+                  <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--muted-strong)] transition group-open:text-[var(--accent)]">
+                    Ver ejemplos
+                  </summary>
+                  <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-xs text-[var(--muted-strong)]">
+                    {EXCLUDED_LAB_FEATURES.map((f) => (
+                      <span key={f} className="line-through decoration-[var(--accent)]/60">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </details>
               </div>
             </div>
           </SectionReveal>

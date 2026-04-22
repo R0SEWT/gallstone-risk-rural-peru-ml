@@ -171,6 +171,27 @@ export const RESULT_INTERPRETATION: Record<
   },
 };
 
+export const DECISION_GUIDANCE: Record<
+  RiskLevel,
+  {
+    title: string;
+    action: string;
+  }
+> = {
+  bajo: {
+    title: "Acción sugerida",
+    action: "Observación y reevaluación según síntomas. No reduce la necesidad de criterio clínico si hay dolor persistente.",
+  },
+  moderado: {
+    title: "Acción sugerida",
+    action: "Revisión clínica más cuidadosa y considerar ecografía según evolución, examen físico y contexto operativo.",
+  },
+  alto: {
+    title: "Acción sugerida",
+    action: "Priorizar revisión clínica y derivación para ecografía confirmatoria sin tratar la salida como diagnóstico.",
+  },
+};
+
 export const ACT_NOTES = {
   consulta: "Entrevista breve para capturar datos que sí pueden obtenerse en campo.",
   medicion: "Simulación de bioimpedancia como reemplazo operacional del laboratorio.",

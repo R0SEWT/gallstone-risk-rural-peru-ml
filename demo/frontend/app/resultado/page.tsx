@@ -8,6 +8,7 @@ import { RiskGauge } from "@/components/RiskGauge";
 import { ShapWaterfall } from "@/components/ShapWaterfall";
 import {
   ACT_NOTES,
+  DECISION_GUIDANCE,
   HOME_SCENARIOS,
   LIMITATIONS,
   RESULT_INTERPRETATION,
@@ -95,6 +96,7 @@ export default function ResultadoPage() {
   }
 
   const interpretation = RESULT_INTERPRETATION[prediction.risk_level];
+  const guidance = DECISION_GUIDANCE[prediction.risk_level];
   const topDrivers = Object.entries(prediction.shap_values)
     .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
     .slice(0, 4);
@@ -130,6 +132,15 @@ export default function ResultadoPage() {
             >
               Nueva evaluación →
             </button>
+          </div>
+
+          <div className="border-t border-[var(--hairline)] pt-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--muted)]">
+              {guidance.title}
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--muted-strong)]">
+              {guidance.action}
+            </p>
           </div>
 
           <div>
