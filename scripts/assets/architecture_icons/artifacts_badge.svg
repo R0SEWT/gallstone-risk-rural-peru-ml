@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Artifacts badge">
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#d97706"/>
+  <rect x="17" y="18" width="30" height="8" rx="3" fill="#fff7ed"/>
+  <rect x="17" y="28" width="30" height="8" rx="3" fill="#ffedd5"/>
+  <rect x="17" y="38" width="30" height="8" rx="3" fill="#fed7aa"/>
+</svg>

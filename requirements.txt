@@ -1,4 +1,5 @@
 catboost==1.2.10
+diagrams==0.25.1
 imbalanced-learn==0.14.0
 matplotlib==3.10.7
 nbclient==0.10.4

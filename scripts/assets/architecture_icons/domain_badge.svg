@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Domain badge">
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#e0f2fe"/>
+  <circle cx="32" cy="32" r="17" fill="none" stroke="#0369a1" stroke-width="3"/>
+  <path d="M15 32h34M32 15a25 25 0 0 1 0 34M32 15a25 25 0 0 0 0 34M20 23c4 3 20 3 24 0M20 41c4-3 20-3 24 0" fill="none" stroke="#0369a1" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

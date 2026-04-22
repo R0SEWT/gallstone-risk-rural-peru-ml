@@ -93,6 +93,46 @@ Lectura técnica rápida:
 ### Importancia de variables del escenario rural
 ![Importancia SHAP rural](figures/rural_feature_importance.png)
 
+## Tecnologías, arquitectura y despliegue
+### Runtime view
+![Diagrama runtime del demo](demo/frontend/public/architecture/gallstone_runtime_architecture.png)
+
+### Delivery view
+![Diagrama de delivery del demo](demo/frontend/public/architecture/gallstone_delivery_architecture.png)
+
+### Vista rápida
+- **Frontend público:** `demo/frontend`, desplegado en Vercel bajo el subdominio `gallstone.rosewt.dev`.
+- **Backend ML:** `demo/backend`, desplegado como Docker Space en Hugging Face y consumido desde el frontend vía `NEXT_PUBLIC_API_URL`.
+- **Chat guiado:** `demo/frontend/app/api/chat/route.ts`, ejecutado server-side en Next.js y conectado a DeepSeek; no realiza la predicción ML.
+- **Artefactos del modelo:** `demo/backend/models/`, empaquetados dentro del backend y cargados al arranque de FastAPI.
+
+### Stack por capa
+| Capa | Stack principal | Rol |
+| --- | --- | --- |
+| Frontend | `Next.js 16`, `React 19`, `Tailwind CSS 4`, `Framer Motion`, `Zustand` | Landing, flujo `/consulta` → `/medicion` → `/resultado`, estado de sesión y consumo de la API |
+| Chat guiado | `Route Handler /api/chat`, `AI SDK`, `@ai-sdk/openai`, `DeepSeek API` | Entrevista conversacional para capturar las 9 variables iniciales |
+| Backend ML | `Python 3.12`, `FastAPI`, `Uvicorn`, `Pydantic`, `scikit-learn`, `SHAP`, `NumPy`, `joblib` | Endpoints de salud, metadata, predicción, explicación y generación de bioimpedancia |
+| Infraestructura | `Vercel`, `Hugging Face Spaces`, `Docker`, `GitHub` | Hosting del frontend, despliegue del backend y source of truth del proyecto |
+
+### Cómo se conecta todo
+- El usuario entra por `gallstone.rosewt.dev`, que sirve el frontend desde Vercel.
+- El frontend llama al backend FastAPI publicado en Hugging Face Spaces para `health`, `model/info`, `predict/rural`, `explain/rural` y `generate/bioimpedance`.
+- La entrevista médica simulada corre aparte en `/api/chat` y usa DeepSeek solo para extraer datos conversacionales.
+- La inferencia clínica no depende de un endpoint externo de modelos: el backend lleva sus artefactos dentro del contenedor.
+
+### Dónde se cargan los modelos
+- `demo/backend/app/main.py` ejecuta `predictor.load_artifacts()` durante el `lifespan` de FastAPI.
+- `demo/backend/app/predictor.py` carga desde `demo/backend/models/` estos archivos:
+  - `rural_gb_pipeline.joblib`
+  - `bioimpedance_templates.json`
+  - `rural_metrics.json`
+- En ese mismo arranque se inicializa el `TreeExplainer` de SHAP sobre el bloque `gb` del pipeline rural.
+
+### Despliegue
+- Vercel publica el frontend y atiende el subdominio `gallstone.rosewt.dev`.
+- `scripts/deploy_hf_space.sh` sincroniza `demo/backend/` hacia el Space de Hugging Face.
+- El backend expone CORS para `https://gallstone.rosewt.dev` y para previews `*.vercel.app`.
+
 ## Limitaciones
 - El dataset es pequeño: `319` casos.
 - No hay validación externa ni cohortes de Perú.
@@ -125,6 +165,14 @@ Regenerar notebooks y figuras:
 ```bash
 python scripts/build_portfolio_assets.py
 ```
+
+Regenerar el diagrama de arquitectura:
+
+```bash
+python scripts/architecture_mingrammer.py
+```
+
+Ese render genera las vistas `runtime` y `delivery`, y necesita `diagrams` más el binario local de Graphviz (`dot`).
 
 Auditoría del paper y validación metodológica adicional:
 

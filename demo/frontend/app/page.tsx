@@ -18,6 +18,7 @@ import { warmUp } from "@/lib/api";
 import { SectionReveal } from "@/components/SectionReveal";
 import { HairlineDivider } from "@/components/HairlineDivider";
 import { MagneticButton } from "@/components/MagneticButton";
+import { ArchitectureSection } from "@/components/ArchitectureSection";
 import { HumanSilhouette } from "@/components/illustrations/HumanSilhouette";
 import { GallbladderDetail } from "@/components/illustrations/GallbladderDetail";
 import { BioimpedanceGrid } from "@/components/illustrations/BioimpedanceGrid";
@@ -541,7 +542,7 @@ function ClosingSection() {
   return (
     <section className="relative border-t border-[var(--hairline)] px-6 py-24 sm:px-10 md:py-36 lg:px-16">
       <div className="mx-auto max-w-[1280px]">
-        <SectionNumber index="06" label="Entrar al demo" />
+        <SectionNumber index="07" label="Entrar al demo" />
 
         <SectionReveal className="mt-12">
           <h2
@@ -607,6 +608,7 @@ export default function Home() {
       <RuralSection />
       <TradeoffSection />
       <ScenariosSection />
+      <ArchitectureSection />
       <ClosingSection />
     </main>
   );
