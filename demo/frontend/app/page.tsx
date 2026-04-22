@@ -10,7 +10,6 @@ import {
 } from "framer-motion";
 import {
   EXCLUDED_LAB_FEATURES,
-  HERO_FACTS,
   HOME_SCENARIOS,
   LIMITATIONS,
   TRADEOFF_METRICS,
@@ -78,21 +77,16 @@ function Hero() {
         className="relative z-10 mt-auto grid grid-cols-12 gap-6"
       >
         <div className="col-span-12 md:col-span-8 lg:col-span-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[var(--muted)]">
-            Una pieza visual
-          </p>
           <h1
-            className="mt-6 text-balance font-sans font-light leading-[0.94] tracking-[-0.03em] text-[var(--foreground-strong)]"
-            style={{ fontSize: "clamp(2.5rem, 9.2vw, 7.5rem)" }}
+            className="text-balance font-sans font-light leading-[0.98] tracking-[-0.03em] text-[var(--foreground-strong)]"
+            style={{ fontSize: "clamp(2rem, 6.6vw, 5.25rem)" }}
           >
-            Detección de colelitiasis
-            <br />
-            sin&nbsp;
+            Modelo de ML adaptado para diagnóstico rural en&nbsp;
             <span
               className="relative inline-block text-[var(--accent)]"
               style={{ fontStyle: "italic", fontWeight: 300 }}
             >
-              laboratorio
+              tiempo real
               <motion.span
                 aria-hidden
                 initial={{ scaleX: 0, transformOrigin: "left" }}
@@ -103,13 +97,18 @@ function Hero() {
             </span>
             .
           </h1>
+          <p className="mt-6 max-w-xl font-sans text-lg font-light text-[var(--muted-strong)] md:text-xl">
+            Sin laboratorio, usando bioimpedancia.
+          </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 font-mono text-[11px] uppercase tracking-[0.26em] text-[var(--muted-strong)]">
-            <span className="text-[var(--foreground-strong)]">Rody Vilchez</span>
-            <span className="h-px w-6 bg-[var(--hairline-strong)]" />
-            <span>Abril 2026</span>
-            <span className="h-px w-6 bg-[var(--hairline-strong)]" />
-            <span>UPC / CGIAR</span>
+          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[11px] uppercase tracking-[0.26em] text-[var(--muted-strong)]">
+            <span className="text-[var(--foreground-strong)]">ML Systems</span>
+            <span className="h-px w-5 bg-[var(--hairline-strong)]" />
+            <span>Digital Health</span>
+            <span className="h-px w-5 bg-[var(--hairline-strong)]" />
+            <span>Rural AI</span>
+            <span className="h-px w-5 bg-[var(--hairline-strong)]" />
+            <span>XAI</span>
           </div>
         </div>
       </motion.div>
@@ -125,7 +124,7 @@ function Hero() {
         </motion.div>
 
         <div className="flex flex-wrap items-center gap-6">
-          <MagneticButton href="/consulta">Entrar al demo</MagneticButton>
+          <MagneticButton href="/consulta">Simular visita médica</MagneticButton>
           <a
             href="https://github.com/rosewt-upc/WinterProject"
             target="_blank"
@@ -163,34 +162,14 @@ function ProblemSection() {
 
           <SectionReveal delay={0.15} className="flex flex-col md:col-span-5 lg:col-span-4">
             <h2
-              className="font-sans font-light leading-[1.05] tracking-[-0.02em] text-[var(--foreground-strong)]"
-              style={{ fontSize: "clamp(1.75rem, 3.8vw, 2.5rem)" }}
+              className="font-sans font-light leading-[1.1] tracking-[-0.02em] text-[var(--foreground-strong)]"
+              style={{ fontSize: "clamp(1.5rem, 3.2vw, 2.25rem)" }}
             >
-              En la sierra, detectar cálculos biliares tarda <em className="italic text-[var(--accent)] not-italic font-medium">4–5 h</em> de viaje.
+              Llevamos al médico al pueblo. Pero para diagnosticar, <em className="italic text-[var(--accent)] not-italic font-medium">el poblador es el que tiene que ir</em>.
             </h2>
             <p className="mt-8 max-w-md text-[15px] leading-relaxed text-[var(--muted-strong)]">
-              La ecografía vive lejos del poblador. Cuando llega la sospecha, la decisión se mueve — no el diagnóstico.
+              La Red Inversa — el programa público que acerca brigadas médicas a comunidades rurales — no alcanza para cálculos biliares: la ecografía vive en el centro de salud de segundo (II) o tercer (III) nivel más cercano.
             </p>
-
-            <div className="mt-12 space-y-8">
-              {HERO_FACTS.map((fact, i) => (
-                <SectionReveal key={fact.label} delay={0.1 + i * 0.08}>
-                  <HairlineDivider delay={0.1 + i * 0.08} />
-                  <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.26em] text-[var(--muted)]">
-                    {fact.label}
-                  </p>
-                  <p
-                    className="mt-3 font-sans font-light leading-none tracking-[-0.02em] text-[var(--foreground-strong)]"
-                    style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)" }}
-                  >
-                    {fact.value}
-                  </p>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--muted-strong)]">
-                    {fact.note}
-                  </p>
-                </SectionReveal>
-              ))}
-            </div>
           </SectionReveal>
         </div>
       </div>
@@ -352,9 +331,8 @@ function TradeoffBar({
           </p>
         </div>
         <p
-          className={`font-sans font-light tracking-[-0.02em] ${
-            highlight ? "text-[var(--accent)]" : "text-[var(--foreground-strong)]"
-          }`}
+          className={`font-sans font-light tracking-[-0.02em] ${highlight ? "text-[var(--accent)]" : "text-[var(--foreground-strong)]"
+            }`}
           style={{ fontSize: "clamp(2.25rem, 5.5vw, 3.5rem)", lineHeight: 0.9 }}
         >
           {pct}
@@ -368,9 +346,8 @@ function TradeoffBar({
           whileInView={{ scaleX: reduce ? 1 : value }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.3 : 1.6, delay: delay + 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className={`absolute inset-0 block h-[2px] -mt-px ${
-            highlight ? "bg-[var(--accent)] shadow-[0_0_18px_var(--accent-glow)]" : "bg-[var(--foreground-strong)]"
-          }`}
+          className={`absolute inset-0 block h-[2px] -mt-px ${highlight ? "bg-[var(--accent)] shadow-[0_0_18px_var(--accent-glow)]" : "bg-[var(--foreground-strong)]"
+            }`}
         />
       </div>
     </SectionReveal>
